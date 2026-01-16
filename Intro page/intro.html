@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filx | Movie & TV Show Database</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --color-primary: #020d18;
+            --color-secondary: #0f2133;
+            --color-accent: #dd003f;
+            --color-text: #ffffff;
+            --color-overlay: rgba(2, 13, 24, 0.85);
+        }
+        
+        body {
+            background-color: var(--color-primary);
+            color: var(--color-text);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+        
+        /* Background collage container */
+        .collage-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        /* Collage background - single image with multiple posters */
+        .collage-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1925&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.7) saturate(1.2);
+            animation: zoomPan 30s ease-in-out infinite alternate;
+        }
+        
+        /* Overlay with primary color */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom, 
+                rgba(2, 13, 24, 0.9) 0%,
+                rgba(2, 13, 24, 0.85) 30%,
+                rgba(2, 13, 24, 0.8) 50%,
+                rgba(2, 13, 24, 0.9) 100%
+            );
+            z-index: 2;
+        }
+        
+        /* Glowing particles effect */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(221, 0, 63, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 3;
+            width: 90%;
+            max-width: 900px;
+            opacity: 0;
+            animation: fadeInUp 1.5s forwards 1s;
+        }
+        
+        .logo {
+            font-size: 8rem;
+            font-weight: 900;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+            letter-spacing: 5px;
+            text-shadow: 0 5px 20px rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            animation: fadeInLogo 2s forwards 0.5s;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+            z-index: -1;
+        }
+        
+        .logo span {
+            color: var(--color-accent);
+            position: relative;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        .quote {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: 3rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-style: italic;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+            opacity: 0;
+            animation: fadeIn 2s forwards 1.5s;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .quote::before, .quote::after {
+            content: '"';
+            color: var(--color-accent);
+            font-size: 2.5rem;
+            font-weight: bold;
+            position: absolute;
+            opacity: 0.7;
+        }
+        
+        .quote::before {
+            top: -15px;
+            left: -25px;
+        }
+        
+        .quote::after {
+            bottom: -35px;
+            right: -25px;
+        }
+        
+        .enter-btn {
+            background: linear-gradient(135deg, var(--color-accent) 0%, #b30032 100%);
+            color: white;
+            border: none;
+            padding: 1.2rem 3.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(221, 0, 63, 0.5);
+            opacity: 0;
+            animation: fadeIn 1s forwards 2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .enter-btn:hover::before {
+            left: 100%;
+        }
+        
+        .enter-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(221, 0, 63, 0.7);
+        }
+        
+        .enter-btn:active {
+            transform: translateY(-2px);
+        }
+        
+        .enter-btn i {
+            margin-left: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .enter-btn:hover i {
+            transform: translateX(5px);
+        }
+        
+        .footer-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            z-index: 3;
+            opacity: 0;
+            animation: fadeIn 2s forwards 2.5s;
+        }
+        
+        /* Animated film strip effect at edges */
+        .film-strip {
+            position: absolute;
+            width: 100%;
+            height: 40px;
+            background: repeating-linear-gradient(
+                90deg,
+                #000 0px,
+                #000 20px,
+                #fff 20px,
+                #fff 40px
+            );
+            opacity: 0.1;
+            z-index: 2;
+        }
+        
+        .film-strip-top {
+            top: 0;
+            animation: slideRight 20s linear infinite;
+        }
+        
+        .film-strip-bottom {
+            bottom: 0;
+            animation: slideLeft 20s linear infinite;
+        }
+        
+        /* Animations */
+        @keyframes fadeInLogo {
+            from { 
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes zoomPan {
+            0% {
+                transform: scale(1) translate(0, 0);
+            }
+            100% {
+                transform: scale(1.1) translate(-2%, -2%);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes slideRight {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes slideLeft {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .logo {
+                font-size: 6rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 4.5rem;
+                letter-spacing: 3px;
+            }
+            
+            .quote {
+                font-size: 1.2rem;
+                margin-bottom: 2.5rem;
+            }
+            
+            .enter-btn {
+                padding: 1rem 2.5rem;
+                font-size: 1.1rem;
+            }
+            
+            .collage-bg {
+                animation: zoomPan 40s ease-in-out infinite alternate;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 3.5rem;
+            }
+            
+            .quote {
+                font-size: 1rem;
+                margin-bottom: 2rem;
+            }
+            
+            .quote::before {
+                left: -15px;
+            }
+            
+            .quote::after {
+                right: -15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background collage -->
+    <div class="collage-container">
+        <div class="collage-bg"></div>
+        <div class="particles" id="particles"></div>
+    </div>
+    
+    <!-- Overlay -->
+    <div class="overlay"></div>
+    
+    <!-- Film strip effects -->
+    <div class="film-strip film-strip-top"></div>
+    <div class="film-strip film-strip-bottom"></div>
+    
+    <!-- Main Content -->
+    <div class="content">
+        <h1 class="logo">Fil<span>x</span></h1>
+        <p class="quote">Your gateway to the world of cinema and television. Discover, explore, and enjoy.</p>
+        <a href="index.html" class="enter-btn" id="enterBtn">
+    Enter Website <i class="fas fa-arrow-right"></i>
+</a>
+
+    </div>
+    
+    <!-- Footer Text -->
+    <div class="footer-text">
+        <p>Discover thousands of movies and TV shows with detailed information, ratings, and trailers</p>
+    </div>
+    
+    <script>
+        // Create glowing particles effect
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation
+                const duration = Math.random() * 10 + 5;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite alternate`;
+                
+                // Random opacity
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Add CSS for particle floating animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes float {
+                0% { 
+                    transform: translate(0, 0) scale(1); 
+                    opacity: 0.3;
+                }
+                50% { 
+                    opacity: 0.6;
+                }
+                100% { 
+                    transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(1.2); 
+                    opacity: 0.3;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Button click event
+        document.getElementById('enterBtn').addEventListener('click', function() {
+            // Add click animation
+            this.style.transform = 'scale(0.95)';
+            
+            // Change button text and icon
+            this.innerHTML = 'Loading <i class="fas fa-spinner fa-spin"></i>';
+            
+            // Add a glow effect to the entire page before redirecting
+            document.querySelector('.overlay').style.background = 'rgba(2, 13, 24, 0.6)';
+            document.querySelector('.logo').style.textShadow = '0 0 20px var(--color-accent)';
+            document.querySelector('.logo span').style.textShadow = '0 0 15px var(--color-accent)';
+            
+            // Simulate loading delay before redirecting
+            setTimeout(() => {
+                // In a real scenario, this would redirect to your main website
+                // window.location.href = "https://yourwebsite.com";
+                
+                // For demo purposes, we'll show an alert
+                alert("Redirecting to the main website...\n\nIn the actual implementation, this would take you to your movie/TV show viewer.");
+                
+                // Reset button after alert
+                this.innerHTML = 'Enter Website <i class="fas fa-arrow-right"></i>';
+                this.style.transform = '';
+                
+                // Reset glow effects
+                document.querySelector('.overlay').style.background = '';
+                document.querySelector('.logo').style.textShadow = '';
+                document.querySelector('.logo span').style.textShadow = '';
+            }, 1200);
+        });
+        
+        // Add keyboard support for the button
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Enter' || event.code === 'Space') {
+                document.getElementById('enterBtn').click();
+            }
+        });
+        
+        // Initialize particles when page loads
+        window.addEventListener('load', function() {
+            createParticles();
+            
+            // Add a subtle entrance effect to the background
+            const collageBg = document.querySelector('.collage-bg');
+            collageBg.style.opacity = '0';
+            setTimeout(() => {
+                collageBg.style.transition = 'opacity 2s ease';
+                collageBg.style.opacity = '1';
+            }, 300);
+        });
+        
+        // Add mouse move parallax effect
+        document.addEventListener('mousemove', function(e) {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            document.querySelector('.content').style.transform = `translate(-50%, -50%) translate(${x * 0.3}px, ${y * 0.3}px)`;
+            document.querySelector('.logo').style.transform = `translate(${x * 0.1}px, ${y * 0.1}px)`;
+            document.querySelector('.quote').style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+        });
+    </script>
+</body>
+</html>

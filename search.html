@@ -11,45 +11,56 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/spinner.css" />
     <script src="js/script.js" defer></script>
-    <title>Flixx &mdash; Search</title>
+    <title>Flixx — Search</title>
   </head>
   <body>
-
-    <header class="main-header" id="main-header">
-      <div class="container">
+    <header class="main-header scrolled" id="main-header">
+      <div class="header-inner">
         <div class="logo"><a href="/">FLIXX</a></div>
-        <nav>
+        <nav class="main-nav">
           <ul>
             <li><a class="nav-link" href="/">Movies</a></li>
             <li><a class="nav-link" href="shows.html">TV Shows</a></li>
           </ul>
         </nav>
+        <div class="header-right">
+          <button class="search-toggle-btn" id="search-toggle" aria-label="Search">
+            <i class="fas fa-search"></i>
+          </button>
+          <div class="header-search-bar" id="header-search-bar">
+            <form action="search.html" class="header-search-form">
+              <input type="text" name="search-term" id="search-term" placeholder="Titles, movies, shows..." autocomplete="off" />
+              <button type="submit"><i class="fas fa-search"></i></button>
+            </form>
+          </div>
+        </div>
       </div>
     </header>
 
-    <div style="height: 68px;"></div>
+    <div style="height:68px;"></div>
 
-    <section class="search">
-      <div class="container">
-        <div id="alert"></div>
-        <form action="/search.html" class="search-form">
+    <!-- Filter bar -->
+    <div class="search-filter-bar">
+      <div class="search-filter-inner">
+        <div id="alert" class="global-alert" style="margin:0;"></div>
+        <form action="search.html" class="search-filter-form">
           <div class="search-radio">
-            <input type="radio" id="movie" name="type" value="movie" checked />
-            <label for="movie">Movies</label>
-            <input type="radio" id="tv" name="type" value="tv" />
-            <label for="tv">TV Shows</label>
+            <input type="radio" id="filter-movie" name="type" value="movie" checked />
+            <label for="filter-movie">Movies</label>
+            <input type="radio" id="filter-tv" name="type" value="tv" />
+            <label for="filter-tv">TV Shows</label>
           </div>
-          <div class="search-flex">
-            <input type="text" name="search-term" id="search-term" placeholder="Search movies & shows..." />
-            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+          <div class="search-filter-input">
+            <input type="text" name="search-term" id="search-term-filter" placeholder="Search..." autocomplete="off" />
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
           </div>
         </form>
       </div>
-    </section>
+    </div>
 
-    <section id="search-results-wrapper" class="container">
+    <section class="row-section">
       <heading id="search-results-heading"></heading>
-      <div id="search-results" class="grid"></div>
+      <div id="search-results" class="row-grid"></div>
       <div id="pagination">
         <div class="pagination">
           <button class="btn btn-primary" id="prev"><i class="fas fa-chevron-left"></i> Prev</button>
@@ -60,7 +71,7 @@
     </section>
 
     <footer class="main-footer">
-      <div class="container">
+      <div class="footer-inner">
         <div class="logo"><span>FLIXX</span></div>
         <p class="footer-copy">&copy; 2025 Flixx. All rights reserved.</p>
         <div class="social-links">
@@ -70,7 +81,6 @@
         </div>
       </div>
     </footer>
-
     <div class="spinner"></div>
   </body>
 </html>

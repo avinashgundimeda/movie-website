@@ -65,12 +65,6 @@ cd movie-website
 
 ---
 
-## 📸 Screenshots
-
-(Add your website screenshots here)
-
----
-
 ## 📌 How It Works
 
 * Fetches movie and TV show data from an external API
